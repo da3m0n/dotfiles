@@ -130,6 +130,7 @@ function Backup-ShellConfig {
     $files = @(
         $PROFILE,
         (Join-Path (Split-Path -Parent $PROFILE) 'agnosterplus.omp.json'),
+		(Join-Path (Split-Path -Parent $PROFILE) 'README.md'),
         (Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json')
     )
     foreach ($f in $files) {
