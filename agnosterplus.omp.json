@@ -1,0 +1,113 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 4,
+  "final_space": true,
+  "palette": {
+    "session_bg": "#ffffff",
+    "session_fg": "#100e23",
+    "path_bg": "#91ddff",
+    "path_fg": "#100e23",
+    "git_bg": "#95ffa4",
+    "git_fg": "#193549",
+    "clock": "#007acc",
+    "git_dirty": "#ffd479",
+    "git_ahead": "#c9a7ff",
+    "git_behind": "#ff9e9e",
+    "git_diverged": "#ff9e9e"
+  },
+  "palettes": {
+    "template": "{{ if eq .Env.OMP_THEME \"light\" }}light{{ else }}dark{{ end }}",
+    "list": {
+      "dark": {
+        "session_bg": "#ffffff",
+        "session_fg": "#100e23",
+        "path_bg": "#91ddff",
+        "path_fg": "#100e23",
+        "git_bg": "#95ffa4",
+        "git_fg": "#193549",
+        "clock": "#007acc",
+        "git_dirty": "#ffd479",
+        "git_ahead": "#c9a7ff",
+        "git_behind": "#ff9e9e",
+        "git_diverged": "#ff9e9e"
+      },
+      "light": {
+        "session_bg": "#4b5563",
+        "session_fg": "#ffffff",
+        "path_bg": "#1f6fb2",
+        "path_fg": "#ffffff",
+        "git_bg": "#237a4b",
+        "git_fg": "#ffffff",
+        "clock": "#1f6fb2",
+        "git_dirty": "#b45309",
+        "git_ahead": "#6d28d9",
+        "git_behind": "#b91c1c",
+        "git_diverged": "#b91c1c"
+      }
+    }
+  },
+  "blocks": [
+    {
+      "type": "rprompt",
+      "segments": [
+        {
+          "type": "time",
+          "style": "plain",
+          "foreground": "p:clock",
+          "template": " {{ .CurrentDate | date .Format }} ",
+          "options": {
+            "time_format": "15:04:05"
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "session",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "background": "p:session_bg",
+          "foreground": "p:session_fg",
+          "template": " {{ .UserName }}@{{ .HostName }} "
+        },
+        {
+          "type": "path",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "background": "p:path_bg",
+          "foreground": "p:path_fg",
+          "template": " {{ .Path }} ",
+          "options": {
+            "folder_icon": "\uf115",
+            "folder_separator_icon": " \ue0b1 ",
+            "home_icon": "\ueb06",
+            "style": "agnoster"
+          }
+        },
+        {
+          "type": "git",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "background": "p:git_bg",
+          "foreground": "p:git_fg",
+          "template": " {{ .HEAD }}{{ if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }} ",
+          "options": {
+            "fetch_status": true,
+            "branch_icon": "\ue0a0 ",
+            "branch_max_length": 30
+          },
+          "background_templates": [
+            "{{ if or (.Working.Changed) (.Staging.Changed) }}p:git_dirty{{ end }}",
+            "{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:git_diverged{{ end }}",
+            "{{ if gt .Ahead 0 }}p:git_ahead{{ end }}",
+            "{{ if gt .Behind 0 }}p:git_behind{{ end }}"
+          ]
+        }
+      ]
+    }
+  ],
+  "pwd": "osc99"
+}
