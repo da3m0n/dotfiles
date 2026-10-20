@@ -17,10 +17,8 @@ else {
     Write-Warning "Oh My Posh config not found: $ompConfig"
 }
 
-# --- Terminal-Icons (loaded when the shell first goes idle, to speed up startup) ---
-$null = Register-EngineEvent -SourceIdentifier PowerShell.OnIdle -MaxTriggerCount 1 -Action {
-    Import-Module Terminal-Icons -Global
-}
+# --- Terminal-Icons (file/folder icons in directory listings) ---
+Import-Module -Name Terminal-Icons
 
 # --- zoxide (smart directory navigation) ---
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
@@ -101,23 +99,6 @@ function ws {
     Start-Process -FilePath $exe.FullName -ArgumentList "`"$((Resolve-Path $Path).Path)`""
 }
 
-
-# --- Open a folder in PyCharm ---
-function pycharm {
-    param([string]$Path = ".")
-
-    $exe = Get-ChildItem "C:\Program Files\JetBrains\PyCharm*\bin\pycharm64.exe" -ErrorAction SilentlyContinue |
-        Sort-Object FullName -Descending |
-        Select-Object -First 1
-
-    if (-not $exe) {
-        Write-Warning "WebStorm not found under C:\Program Files\JetBrains"
-        return
-    }
-
-    Start-Process -FilePath $exe.FullName -ArgumentList "`"$((Resolve-Path $Path).Path)`""
-}
-
 function which($name) {
     Get-Command $name | Select-Object -ExpandProperty Source
 }
@@ -130,7 +111,7 @@ function Backup-ShellConfig {
     $files = @(
         $PROFILE,
         (Join-Path (Split-Path -Parent $PROFILE) 'agnosterplus.omp.json'),
-		(Join-Path (Split-Path -Parent $PROFILE) 'README.md'),
+        (Join-Path (Split-Path -Parent $PROFILE) 'README.md'),
         (Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json')
     )
     foreach ($f in $files) {
