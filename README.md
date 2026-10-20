@@ -9,7 +9,8 @@ A PowerShell 7 setup for Windows Terminal with two profiles, **PowerShell - Ligh
 | `Microsoft.PowerShell_profile.ps1` | the folder `$PROFILE` points at (normally `C:\Users\<you>\Documents\PowerShell\`) | Detects light/dark, starts Oh My Posh, sets PSReadLine colours, fzf, zoxide, helper functions, `Backup-ShellConfig` |
 | `agnosterplus.omp.json` | **same folder as the profile** | Oh My Posh theme, one file with `light` and `dark` palettes and git-status colours |
 | `settings.json` | Windows Terminal settings folder (see step 5) | Terminal profiles, colour schemes, font, starting folder |
-| `README.md` | anywhere | This file |
+| `Install-ShellConfig.ps1` | stays in the repo | One-step installer for a new PC (see "Quick install") |
+| `README.md` | the profile folder (copied by the installer) | This file |
 
 ## How it works (read this once)
 
@@ -25,9 +26,41 @@ Current guids:
 - PowerShell - Light: `{f63b4f74-c9bb-5718-9e33-467c2122f6a7}`
 - PowerShell - Dark: `{f3c0b797-b2d6-550c-8bed-1d9ecc4785d4}`
 
-## Installing on a new PC
+## Quick install on a new PC (recommended)
 
-Open **Windows PowerShell** (or any terminal) and work through these steps in order.
+One script does everything below: installs the programs, the font and the modules, then copies the profile, theme, README and Windows Terminal settings into the right folders. Run it in **Windows PowerShell** (it is already on every Windows PC).
+
+```powershell
+winget install --id Git.Git -e        # skip if Git is already installed; reopen the window afterwards
+git clone https://github.com/<you>/dotfiles.git
+cd dotfiles\powershell
+powershell -ExecutionPolicy Bypass -File .\Install-ShellConfig.ps1
+```
+
+Useful options:
+
+| Option | Effect |
+|---|---|
+| `-DryRun` | Show what would happen without changing anything. Run this first if you're unsure. |
+| `-SkipInstall` | Only copy the config files; don't install programs, font or modules. |
+| `-SkipSettings` | Leave Windows Terminal's `settings.json` alone. |
+
+What the script does for you:
+
+- Skips programs that are already installed.
+- Backs up any existing file that differs, as `name.bak-yyyyMMdd-HHmmss`, before replacing it.
+- Finds the correct profile folder, including OneDrive-redirected Documents.
+- Finds the right Windows Terminal settings folder. If Terminal has never been run, it creates the folder.
+- Replaces the `H:\projects` starting folder with `~\projects` if the PC has no `H:` drive.
+- Is safe to run more than once.
+
+Afterwards, close **all** Terminal windows, reopen Terminal and follow "Check it works" below. Windows may ask for permission during the installs. The font step relies on `oh-my-posh` being found in the same window; if the script warns about that, open a new window and run `oh-my-posh font install FiraCode`.
+
+Put `Install-ShellConfig.ps1` in your dotfiles folder (`C:\Users\<you>\dotfiles\powershell`) once. The next `Backup-ShellConfig` run will commit it.
+
+## Manual install (fallback)
+
+Use these steps if the script can't be used. Open **Windows PowerShell** (or any terminal) and work through them in order.
 
 ### 1. Install the programs
 
@@ -141,7 +174,7 @@ Visual checks:
 
 ## Everyday use
 
-- **Back up your config:** run `Backup-ShellConfig`. It copies the profile, theme and Terminal settings to `C:\Users\<you>\dotfiles\powershell` and makes a git commit. It pushes to GitHub only if you have set up a remote (see "Optional: push backups to GitHub" below); otherwise it stays local.
+- **Back up your config:** run `Backup-ShellConfig "What you changed"`. The text becomes the git commit message, so your history explains each change. If you leave it out, you're asked for one (Enter uses a dated default). It copies the profile, theme and Terminal settings to `C:\Users\<you>\dotfiles\powershell` and makes a git commit. It pushes to GitHub only if you have set up a remote (see "Optional: push backups to GitHub" below); otherwise it stays local.
 - **Change prompt colours:** edit `palettes.list.light` or `palettes.list.dark` in `agnosterplus.omp.json`. Only that one file needs changing.
 - **Change typed-command colours:** edit the `$hex` tables in the profile (the `if ($isLight) {...} else {...}` block).
 - **Add another look:** add a palette name to `palettes.list`, extend the `template` line in the theme, and add a Terminal profile with its own guid.
@@ -178,7 +211,7 @@ On a new PC you can then `git clone` the repository and copy the files in steps 
 | Parts of typed commands are hard to read | PSReadLine colours aren't being applied. Run the check in step 7. If `CommandColor` shows a default such as `<ESC>[93m`, the colour block didn't run. Check for red errors when a tab opens, and that nothing later in the profile sets other `-Colors`. |
 | Light tab shows dark-theme colours | `$lightGuid` doesn't match the Light profile's `guid` in `settings.json`. Check `$env:WT_PROFILE_ID` in the Light tab and compare. |
 | Changed a colour scheme and text became hard to read | Prompt and syntax colours are fixed hex values chosen for a light or dark background. Keep the Light profile on a light scheme and the Dark profile on a dark one. |
-| `ls` has no icons straight after startup | Terminal-Icons loads when the shell first goes idle, to speed up startup. Icons appear a moment later. |
+| No file/folder icons in `ls` | Check `Get-Module Terminal-Icons`. If empty, the module isn't loaded: run `Install-Module Terminal-Icons -Scope CurrentUser` and check the profile has `Import-Module Terminal-Icons`. If you see boxes instead of icons, the Terminal profile isn't using the Nerd Font. |
 | `ws` says WebStorm not found | WebStorm isn't under `C:\Program Files\JetBrains\`. Edit the path in the function. |
 | `print primary` shows nothing, or `$env:POSH_THEME` is empty | Neither is a reliable test on this Oh My Posh version. Use `oh-my-posh debug --config "<path to agnosterplus.omp.json>" --shell pwsh` instead and check the `Config path:` line. |
 

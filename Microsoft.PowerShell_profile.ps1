@@ -18,7 +18,7 @@ else {
 }
 
 # --- Terminal-Icons (file/folder icons in directory listings) ---
-Import-Module -Name Terminal-Icons
+Import-Module Terminal-Icons
 
 # --- zoxide (smart directory navigation) ---
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
@@ -104,7 +104,16 @@ function which($name) {
 }
 
 # --- Back up profile, theme and Windows Terminal settings into a local git repo ---
+# Usage:  Backup-ShellConfig "Describe what you changed"
+#         Backup-ShellConfig            (asks for a message; Enter uses a dated default)
 function Backup-ShellConfig {
+    param([Parameter(Position = 0)][string]$Message)
+
+    if (-not $Message) {
+        $Message = Read-Host 'Commit message (Enter for default)'
+    }
+    if (-not $Message) { $Message = "Shell config backup $(Get-Date -Format 's')" }
+
     $dest = Join-Path $HOME 'dotfiles\powershell'
     New-Item -ItemType Directory -Force $dest | Out-Null
 
@@ -122,7 +131,7 @@ function Backup-ShellConfig {
     if (Get-Command git -ErrorAction SilentlyContinue) {
         git -C $dest init -q
         git -C $dest add -A
-        git -C $dest commit -q -m "Shell config backup $(Get-Date -Format 's')" 2>$null
+        git -C $dest commit -q -m $Message 2>$null | Out-Null
         # Push to GitHub only if a remote has been set up (see README)
         if (git -C $dest remote) { git -C $dest push -q -u origin HEAD }
     }
