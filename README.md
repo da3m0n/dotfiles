@@ -32,10 +32,12 @@ One script does everything below: installs the programs, the font and the module
 
 ```powershell
 winget install --id Git.Git -e        # skip if Git is already installed; reopen the window afterwards
-git clone https://github.com/<you>/dotfiles.git
-cd dotfiles\powershell
+git clone https://github.com/<you>/dotfiles.git "$HOME\dotfiles\powershell"
+cd "$HOME\dotfiles\powershell"
 powershell -ExecutionPolicy Bypass -File .\Install-ShellConfig.ps1
 ```
+
+**Clone into `$HOME\dotfiles\powershell` exactly as shown.** The GitHub repository's root is that folder's contents (the profile, theme, installer and so on sit at the top level), and `Backup-ShellConfig` expects the repo at `$HOME\dotfiles\powershell` on every PC. Cloning into any other folder means backups would create a second, separate repo.
 
 Useful options:
 
@@ -56,7 +58,7 @@ What the script does for you:
 
 Afterwards, close **all** Terminal windows, reopen Terminal and follow "Check it works" below. Windows may ask for permission during the installs. The font step relies on `oh-my-posh` being found in the same window; if the script warns about that, open a new window and run `oh-my-posh font install FiraCode`.
 
-Put `Install-ShellConfig.ps1` in your dotfiles folder (`C:\Users\<you>\dotfiles\powershell`) once. The next `Backup-ShellConfig` run will commit it.
+On your main PC, put `Install-ShellConfig.ps1` in your dotfiles folder (`C:\Users\<you>\dotfiles\powershell`) once. The next `Backup-ShellConfig` run will commit it.
 
 ## Manual install (fallback)
 
@@ -197,7 +199,7 @@ git -C "$HOME\dotfiles\powershell" push -u origin main
 
 Keep the repository private, and don't put passwords, API keys or tokens in the profile. `settings.json` contains your folder paths.
 
-On a new PC you can then `git clone` the repository and copy the files in steps 4 and 5.
+On a new PC you can then clone the repository into `$HOME\dotfiles\powershell` (see "Quick install") and copy the files in steps 4 and 5.
 
 ## Troubleshooting
 
