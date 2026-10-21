@@ -68,6 +68,7 @@ function Copy-WithBackup([string]$Source, [string]$DestDir) {
 $profileSrc  = Join-Path $repo 'Microsoft.PowerShell_profile.ps1'
 $themeSrc    = Join-Path $repo 'agnosterplus.omp.json'
 $readmeSrc   = Join-Path $repo 'README.md'
+$iconsSrc    = Join-Path $repo 'rowan_light.psd1'
 $settingsSrc = Join-Path $repo 'settings.json'
 
 foreach ($f in @($profileSrc, $themeSrc)) {
@@ -152,7 +153,7 @@ if (-not $SkipInstall) {
 # ============================================================
 # 2. Profile, theme, README
 # ============================================================
-Write-Step 'Copying profile, theme and README'
+Write-Step 'Copying profile, theme, README and Terminal-Icons light theme'
 $profileDir = $null
 $pwshPath = Get-PwshPath
 if ($pwshPath) {
@@ -169,6 +170,7 @@ if (-not (Test-Path $profileDir)) {
 Copy-WithBackup $profileSrc $profileDir
 Copy-WithBackup $themeSrc   $profileDir
 if (Test-Path $readmeSrc) { Copy-WithBackup $readmeSrc $profileDir }
+if (Test-Path $iconsSrc)  { Copy-WithBackup $iconsSrc  $profileDir }
 
 # ============================================================
 # 3. Windows Terminal settings

@@ -38,7 +38,7 @@
                 "face": "FiraCode Nerd Font",
                 "size": 14
             },
-            "startingDirectory": "H:\\projects"
+            "startingDirectory": "C:\\Users\\rnaude\\projects"
         },
         "list": 
         [
@@ -59,7 +59,7 @@
                 "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
                 "hidden": false,
                 "name": "Windows PowerShell",
-                "startingDirectory": "H:\\projects"
+                "startingDirectory": "C:\\Users\\rnaude\\projects"
             },
             {
                 "commandline": "%SystemRoot%\\System32\\cmd.exe",
@@ -72,7 +72,7 @@
                 "hidden": false,
                 "name": "PowerShell",
                 "source": "Windows.Terminal.PowershellCore",
-                "startingDirectory": "H:\\projects"
+                "startingDirectory": "C:\\Users\\rnaude\\projects"
             },
             {
                 "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",

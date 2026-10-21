@@ -20,6 +20,19 @@ else {
 # --- Terminal-Icons (file/folder icons in directory listings) ---
 Import-Module Terminal-Icons
 
+# Colour theme for listings: a darker custom theme on Light, the default on Dark.
+# (Terminal-Icons saves the active theme per user, so only switch when it differs.)
+$lightIcons = Join-Path (Split-Path -Parent $PROFILE) 'rowan_light.psd1'
+if ($isLight -and (Test-Path $lightIcons) -and -not (Get-TerminalIconsColorTheme).ContainsKey('rowan_light')) {
+    Add-TerminalIconsColorTheme -Path $lightIcons -Force
+}
+$iconColorTheme = if (-not $isLight) { 'devblackops' }
+                  elseif ((Get-TerminalIconsColorTheme).ContainsKey('rowan_light')) { 'rowan_light' }
+                  else { 'devblackops_light' }
+if ((Get-TerminalIconsTheme).Color.Name -ne $iconColorTheme) {
+    Set-TerminalIconsTheme -ColorTheme $iconColorTheme -Force
+}
+
 # --- zoxide (smart directory navigation) ---
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
@@ -121,6 +134,7 @@ function Backup-ShellConfig {
         $PROFILE,
         (Join-Path (Split-Path -Parent $PROFILE) 'agnosterplus.omp.json'),
         (Join-Path (Split-Path -Parent $PROFILE) 'README.md'),
+        (Join-Path (Split-Path -Parent $PROFILE) 'rowan_light.psd1'),
         (Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json')
     )
     foreach ($f in $files) {

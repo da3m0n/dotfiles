@@ -9,6 +9,7 @@ A PowerShell 7 setup for Windows Terminal with two profiles, **PowerShell - Ligh
 | `Microsoft.PowerShell_profile.ps1` | the folder `$PROFILE` points at (normally `C:\Users\<you>\Documents\PowerShell\`) | Detects light/dark, starts Oh My Posh, sets PSReadLine colours, fzf, zoxide, helper functions, `Backup-ShellConfig` |
 | `agnosterplus.omp.json` | **same folder as the profile** | Oh My Posh theme, one file with `light` and `dark` palettes and git-status colours |
 | `settings.json` | Windows Terminal settings folder (see step 5) | Terminal profiles, colour schemes, font, starting folder |
+| `rowan_light.psd1` | the profile folder | Custom darker Terminal-Icons colour theme used for `ls` in the Light profile |
 | `Install-ShellConfig.ps1` | stays in the repo | One-step installer for a new PC (see "Quick install") |
 | `README.md` | the profile folder (copied by the installer) | This file |
 
@@ -176,7 +177,7 @@ Visual checks:
 
 ## Everyday use
 
-- **Back up your config:** run `Backup-ShellConfig "What you changed"`. The text becomes the git commit message, so your history explains each change. If you leave it out, you're asked for one (Enter uses a dated default). It copies the profile, theme and Terminal settings to `C:\Users\<you>\dotfiles\powershell` and makes a git commit. It pushes to GitHub only if you have set up a remote (see "Optional: push backups to GitHub" below); otherwise it stays local.
+- **Back up your config:** run `Backup-ShellConfig "What you changed"`. The text becomes the git commit message, so your history explains each change. If you leave it out, you're asked for one (Enter uses a dated default). It copies the profile, theme, Terminal-Icons light theme and Terminal settings to `C:\Users\<you>\dotfiles\powershell` and makes a git commit. It pushes to GitHub only if you have set up a remote (see "Optional: push backups to GitHub" below); otherwise it stays local.
 - **Change prompt colours:** edit `palettes.list.light` or `palettes.list.dark` in `agnosterplus.omp.json`. Only that one file needs changing.
 - **Change typed-command colours:** edit the `$hex` tables in the profile (the `if ($isLight) {...} else {...}` block).
 - **Add another look:** add a palette name to `palettes.list`, extend the `template` line in the theme, and add a Terminal profile with its own guid.
@@ -213,6 +214,7 @@ On a new PC you can then clone the repository into `$HOME\dotfiles\powershell` (
 | Parts of typed commands are hard to read | PSReadLine colours aren't being applied. Run the check in step 7. If `CommandColor` shows a default such as `<ESC>[93m`, the colour block didn't run. Check for red errors when a tab opens, and that nothing later in the profile sets other `-Colors`. |
 | Light tab shows dark-theme colours | `$lightGuid` doesn't match the Light profile's `guid` in `settings.json`. Check `$env:WT_PROFILE_ID` in the Light tab and compare. |
 | Changed a colour scheme and text became hard to read | Prompt and syntax colours are fixed hex values chosen for a light or dark background. Keep the Light profile on a light scheme and the Dark profile on a dark one. |
+| `ls` colours look the same on Light and Dark / pale on Light | Run `(Get-TerminalIconsTheme).Color.Name`: it should be `rowan_light` on a Light tab and `devblackops` on Dark. If not, check `rowan_light.psd1` sits next to the profile. The theme choice is saved per user, so open Light and Dark tabs one at a time. |
 | No file/folder icons in `ls` | Check `Get-Module Terminal-Icons`. If empty, the module isn't loaded: run `Install-Module Terminal-Icons -Scope CurrentUser` and check the profile has `Import-Module Terminal-Icons`. If you see boxes instead of icons, the Terminal profile isn't using the Nerd Font. |
 | `ws` says WebStorm not found | WebStorm isn't under `C:\Program Files\JetBrains\`. Edit the path in the function. |
 | `print primary` shows nothing, or `$env:POSH_THEME` is empty | Neither is a reliable test on this Oh My Posh version. Use `oh-my-posh debug --config "<path to agnosterplus.omp.json>" --shell pwsh` instead and check the `Config path:` line. |
