@@ -52,11 +52,12 @@ Set-PSReadLineKeyHandler -Key Ctrl+LeftArrow -Function BackwardWord
 Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function ForwardWord
 
 # Syntax-highlighting colours that stay readable on both backgrounds
-function ConvertTo-Ansi([string]$Hex) {
+function ConvertTo-Ansi([string]$Hex, [switch]$Background) {
     $r = [Convert]::ToInt32($Hex.Substring(1, 2), 16)
     $g = [Convert]::ToInt32($Hex.Substring(3, 2), 16)
     $b = [Convert]::ToInt32($Hex.Substring(5, 2), 16)
-    "`e[38;2;${r};${g};${b}m"
+    $code = if ($Background) { 48 } else { 38 }
+    "`e[${code};2;${r};${g};${b}m"
 }
 
 $hex = if ($isLight) {
@@ -79,13 +80,30 @@ foreach ($k in $hex.Keys) {
     $prop = if ($k -eq 'Default') { 'DefaultTokenColor' } else { "${k}Color" }
     if ($supported -contains $prop) { $colors[$k] = ConvertTo-Ansi $hex[$k] }
 }
+
+# Highlight for the item you are scrolling through in the suggestion list
+# (background, then text colour). Change these two hex values to taste.
+$selectedBg = if ($isLight) { '#bfdbfe' } else { '#92a6be' }
+$selectedFg = if ($isLight) { '#1f2937' } else { '#f8f8f2' }
+if ($supported -contains 'ListPredictionSelectedColor') {
+    $colors['ListPredictionSelected'] = (ConvertTo-Ansi $selectedBg -Background) + (ConvertTo-Ansi $selectedFg)
+}
 Set-PSReadLineOption -Colors $colors
 
 # --- fzf / PSFzf ---
-$env:FZF_DEFAULT_OPTS = if ($isLight) { '--color=light' } else { '--color=dark' }
+$env:FZF_DEFAULT_OPTS = if ($isLight) { "--color=light,bg+:$selectedBg,fg+:$selectedFg" } else { "--color=dark,bg+:$selectedBg,fg+:$selectedFg" }
 Import-Module PSFzf
 Set-PsFzfOption -PSReadLineChordReverseHistory 'Ctrl+r'
 Set-PsFzfOption -PSReadLineChordProvider 'Ctrl+t'
+
+# --- Start in the projects folder (first one that exists on this PC) ---
+# Only when the shell opened in the home folder, so Duplicate Tab/Pane keeps its folder.
+if ($PWD.Path -eq $HOME) {
+    $startDir = @('H:\projects', (Join-Path $HOME 'projects')) |
+        Where-Object { Test-Path $_ } |
+        Select-Object -First 1
+    if ($startDir) { Set-Location $startDir }
+}
 
 # --- Navigation helpers ---
 function .. {

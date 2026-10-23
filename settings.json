@@ -33,12 +33,14 @@
         "defaults": 
         {
             "colorScheme": "Campbell Powershell",
-            "startingDirectory": "%USERPROFILE%",
             "font": 
             {
                 "face": "FiraCode Nerd Font",
                 "size": 14
-            }
+            },
+            "opacity": 88,
+            "startingDirectory": "%USERPROFILE%",
+            "useAcrylic": true
         },
         "list": 
         [
